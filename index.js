@@ -23,35 +23,33 @@ const listEndpoints = require("express-list-endpoints");
 const path = require('path');
 const app = express();
 
+// Define your allowed frontend(s)
 const allowedOrigins = [
-  'http://localhost:3000',
-  'https://backend-silk-tau-85.vercel.app/' // replace with your actual deployed frontend
+  "http://localhost:3000",
+  "https://frontend-seven-psi-63.vercel.app"  // ✅ your real frontend on Vercel
 ];
 
+// Middleware
 app.use(express.json({ limit: "50mb" }));
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS Not Allowed"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+}));
 
-// Handle preflight requests
+// Optional: Handle preflight OPTIONS
 app.options("*", cors());
 
+// Log requests for debugging
 app.use((req, res, next) => {
   console.log(`Request: ${req.method} ${req.url}`);
-  res.on("finish", () => {
-    console.log(`Response Headers for ${req.url}:`, res.getHeaders());
-  });
   next();
 });
 
