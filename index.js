@@ -23,14 +23,28 @@ const listEndpoints = require("express-list-endpoints");
 const path = require('path');
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://backend-silk-tau-85.vercel.app/' // replace with your actual deployed frontend
+];
+
 app.use(express.json({ limit: "50mb" }));
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
+
+// Handle preflight requests
 app.options("*", cors());
 
 app.use((req, res, next) => {
