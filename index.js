@@ -39,13 +39,13 @@ app.use(
 app.options("*", cors());
 
 // Optional: Logging
-app.use((req, res, next) => {
-  console.log(`Request: ${req.method} ${req.url}`);
-  res.on("finish", () => {
-    console.log(`Response Headers for ${req.url}:`, res.getHeaders());
-  });
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log(`Request: ${req.method} ${req.url}`);
+//   res.on("finish", () => {
+//     console.log(`Response Headers for ${req.url}:`, res.getHeaders());
+//   });
+//   next();
+// });
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -59,7 +59,12 @@ const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+  serverSelectionTimeoutMS: 30000, // Increase timeout to 30 seconds
+  socketTimeoutMS: 45000, // Increase socket timeout
+  heartbeatFrequencyMS: 30000, // Increase heartbeat frequency
+  retryWrites: true,
+  retryReads: true,
+}).then(res=>console.log("Connected to MogoDB")).catch(e=>console.error(e));
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_secret_key";
 
